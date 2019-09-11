@@ -21,6 +21,7 @@ Route::group(['prefix' => 'admin'], function() {
     Route::get('goods/edit', 'Admin\GoodsController@edit')->middleware('auth'); // 追記
     Route::post('goods/edit', 'Admin\GoodsController@update')->middleware('auth'); // 追記
     Route::get('goods/delete', 'Admin\GoodsController@delete')->middleware('auth');
+    Route::get('/', 'GoodsController@index');
 });
 
 Auth::routes();
