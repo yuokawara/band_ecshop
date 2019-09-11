@@ -41,9 +41,17 @@
                             @foreach($posts as $goods)
                                 <tr>
                                     <th>{{ $goods->id }}</th>
-                                    <td>{{ $goods->title, 50 }}</td>
-                                    <td>{{ $goods->price, 50 }}</td>
-                                    <td>{{ $goods->body, 250 }}</td>
+                                    <td>{{ Str::limit($goods->title, 50) }}</td>
+                                    <td>{{ Str::limit($goods->price, 50) }}</td>
+                                    <td>{{ Str::limit($goods->body, 250) }}</td>
+                                    <td>
+                                        <div>
+                                            <a href="{{ action('Admin\GoodsController@edit', ['id' => $goods->id]) }}">編集</a>
+                                        </div>
+                                        <div>
+                                            <a href="{{ action('Admin\GoodsController@delete', ['id' => $goods->id]) }}">削除</a>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

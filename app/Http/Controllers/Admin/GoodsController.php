@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 
 // 以下を追記することでNews Modelが扱えるようになる
 use App\Goods;
+use App\History;
+use Carbon\Carbon;
 
 class GoodsController extends Controller
 {
@@ -55,4 +57,53 @@ class GoodsController extends Controller
       }
       return view('admin.goods.index', ['posts' => $posts, 'cond_title' => $cond_title]);
   }
+
+  public function edit(Request $request)
+  {
+      // Goods Modelからデータを取得する
+      $goods = Goods::find($request->id);
+      if (empty($goods)) {
+        abort(404);    
+      }
+      return view('admin.goods.edit', ['goods_form' => $goods]);
+  }
+
+
+  public function update(Request $request)
+  {
+      // Validationをかける
+      $this->validate($request, Goods::$rules);
+      // Goods Modelからデータを取得する
+      $goods = Goods::find($request->id);
+      // 送信されてきたフォームデータを格納する
+      $goods_form = $request->all();
+      if (isset($goods_form['image'])) {
+        $path = $request->file('image')->store('public/image');
+        $goods->image_path = basename($path);
+        unset($goods_form['image']);
+      } elseif (0 == strcmp($request->remove, 'true')) {
+        $goods->image_path = null;
+      }
+      unset($goods_form['_token']);
+      unset($goods_form['remove']);
+
+      // 該当するデータを上書きして保存する
+      $goods->fill($goods_form)->save();
+      // 以下を追記
+      $history = new History;
+      $history->goods_id = $goods->id;
+      $history->edited_at = Carbon::now();
+      $history->save();
+
+      return redirect('admin/goods');
+  }
+  // 以下を追記　　
+  public function delete(Request $request)
+  {
+      // 該当するNews Modelを取得
+      $goods = Goods::find($request->id);
+      // 削除する
+      $goods->delete();
+      return redirect('admin/goods/');
+  }  
 }
